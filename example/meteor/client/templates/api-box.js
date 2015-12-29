@@ -82,16 +82,17 @@ Template.autoApiBox.helpers({
   signature() {
     let signature;
     let escapedLongname = _.escape(this.longname);
+    let escapedName = _.escape(this.name);
     let params, paramNames;
 
     if (this.istemplate || this.ishelper) {
       if (this.istemplate) {
-        signature = "{{> ";
+        signature = "HTML: {{> ";
       } else {
-        signature = "{{ ";
+        signature = "HTML: {{ ";
       }
 
-      signature += escapedLongname;
+      signature += escapedName;
 
       params = this.params;
 
@@ -110,6 +111,17 @@ Template.autoApiBox.helpers({
       signature += " " + paramNames.join(" ");
 
       signature += " }}";
+      signature += `<br> JADE: +${escapedName} ${paramNames.join(" ")}`
+    } else if (this.ismethod) {
+      paramNames = _.map(this.params, param => {
+        let name = param.name;
+        return name;
+      });
+      if (paramNames.length > 0) {
+        signature = `Meteor.call(${this.name}, ${paramNames.join(", ")}, [asyncCallback])`;
+      } else {
+        signature = `Meteor.call(${this.name}, [asyncCallback])`;
+      }
     } else {
       let beforeParens = escapedLongname;
 
